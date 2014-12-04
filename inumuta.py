@@ -4,16 +4,23 @@
 #     what the hell I was thinking at the time.
 # Of course, Python doesn't do multi-line comments, so this will be extra fun.
 
-# Since this is an IRC client, we need some basic imports. Socket for ... sockets, time for sleeping, threading
-# for non-concurrent processing (sending and receiving messages), sys for various things
-
+# Since this is an IRC client, we need some basic imports.
+# Socket for ... sockets
+# time for sleeping
+# threading for non-concurrent processing (sending and receiving messages)
+# sys for various things like exit
+# os for changing interacting with directories
 import socket
 import time
 import threading
 import sys
+import os
 
 # Now for custom imports.
+# world is the location of all the regular program-wide functions including changrab() and receiver()
+# commands.join for joining the default channel
 import world
+import commands.join as join
 
 # One of these days this will load from a config file, but for the moment we're going to set some global variables.
 # SERVER = IRC server connecting to.
@@ -23,13 +30,20 @@ import world
 # PASSWORD = Password to identify the nick with Nickserv, available on most IRC networks.
 # chanlist =  Empty list to store currently-connected channels.
 # threads = Empty list to store the list of current threads
-
 SERVER = "irc.rizon.net"
 DEFAULTCHANNEL = "#HekterBot"
 BOTNICK = "Inumuta"
 PASSWORD = "pancakes"
 chanlist = []
 threads = []
+
+#Now we need to establish whether or not the database exists.
+cwdFileList = os.listdir()
+if "inumuta.db" not in cwdFileList:
+    import setup
+    setup.run()
+else:
+    pass
 
 # Now that we've established the beginning stuff, let's get down to actually doing things.
 # First we need to actually make a socket, and then connect to server as defined in SERVER.
@@ -45,6 +59,7 @@ except Exception as error:
     sys.exit()
 
 # Now we are going to instantiate a thread to receive all messages and passing it the open socket.
+# This utilizes the receiver() function inside the world import.
 t = threading.Thread(target=world.receiver, args=(ircsock,))
 threads.append(t)
 t.start()
@@ -63,4 +78,7 @@ ircsock.send(str.encode("NickServ IDENTIFY " + PASSWORD + "\r\n"))
 time.sleep(2)
 
 # Then we join the default channel.
-ircsock.send(str.encode("JOIN " + DEFAULTCHANNEL + "\r\n"))
+join.run(ircsock, DEFAULTCHANNEL)
+# ircsock.send(str.encode("JOIN " + DEFAULTCHANNEL + "\r\n"))
+
+# The program continues to run inside the receiver() function located in world.
