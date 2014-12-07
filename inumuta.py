@@ -10,17 +10,19 @@
 # threading for non-concurrent processing (sending and receiving messages)
 # sys for various things like exit
 # os for changing interacting with directories
+# sqlite3 as lite for sqlite...
 import socket
 import time
 import threading
 import sys
 import os
+import sqlite3 as lite
 
 # Now for custom imports.
 # world is the location of all the regular program-wide functions including changrab() and receiver()
 # commands.join for joining the default channel
 import world
-import commands.join as join
+import commands.join
 
 # One of these days this will load from a config file, but for the moment we're going to set some global variables.
 # SERVER = IRC server connecting to.
@@ -29,13 +31,15 @@ import commands.join as join
 # BOTNICK = The bot's nick. What it will be named on the IRC network. By default "Inumuta"
 # PASSWORD = Password to identify the nick with Nickserv, available on most IRC networks.
 # chanlist =  Empty list to store currently-connected channels.
-# threads = Empty list to store the list of current threads
-SERVER = "irc.rizon.net"
+# threads = Empty list to store the list of current threads.
+# homedir = home directory where inumuta.py is located.
+SERVER = "198.100.123.140"
 DEFAULTCHANNEL = "#HekterBot"
 BOTNICK = "Inumuta"
 PASSWORD = "pancakes"
 chanlist = []
 threads = []
+homedir = str(os.getcwd())
 
 #Now we need to establish whether or not the database exists.
 cwdFileList = os.listdir()
@@ -73,12 +77,31 @@ time.sleep(2)
 ircsock.send(str.encode("NICK " + BOTNICK + "\r\n"))
 time.sleep(2)
 
-# Then we send along the nickserv password to get our permissions and to be identified.
-ircsock.send(str.encode("NickServ IDENTIFY " + PASSWORD + "\r\n"))
-time.sleep(2)
+# # Then we send along the nickserv password to get our permissions and to be identified.
+# ircsock.send(str.encode("NickServ IDENTIFY " + PASSWORD + "\r\n"))
+# time.sleep(2)
 
-# Then we join the default channel.
-join.run(ircsock, DEFAULTCHANNEL)
-# ircsock.send(str.encode("JOIN " + DEFAULTCHANNEL + "\r\n"))
+# Now we establish a connection to the database.
+con = lite.connect(os.path.join(homedir, "inumuta.db"))
+with con:
+    cur = con.cursor()
+    cur.execute("SELECT * FROM Chans")
+
+    rows = cur.fetchall()
+
+    if rows == []:
+        pass
+    else:
+        for row in rows:
+            world.joinchan(ircsock, row[0], row[1])
+    # for row in rows:
+    #     print(str(row))
+
+# # Use commands/join.py 's ircJoin command to iterate over existing channels that need to be connected to on "startup"
+# commands.join.ircJoin(ircsock, chan)
+
+# # Then we join the default channel.
+# join.run(ircsock, DEFAULTCHANNEL)
+# # ircsock.send(str.encode("JOIN " + DEFAULTCHANNEL + "\r\n"))
 
 # The program continues to run inside the receiver() function located in world.
