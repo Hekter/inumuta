@@ -1,3 +1,5 @@
+# Fuck da police
+
 # This is Inumuta, a basic IRC bot that offers Sovereign-like functions that can be added / removed at will.
 # I'm going to be following heavy documentation during this project in order to make it a) more understandable by others
 # and b) more understandable by me when I have to go back and look at this six months from now and try to figure out
