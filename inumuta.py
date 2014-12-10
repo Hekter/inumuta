@@ -1,44 +1,49 @@
-# Fuck da police
-
 # This is Inumuta, a basic IRC bot that offers Sovereign-like functions that can be added / removed at will.
 # I'm going to be following heavy documentation during this project in order to make it a) more understandable by others
 # and b) more understandable by me when I have to go back and look at this six months from now and try to figure out
 #     what the hell I was thinking at the time.
 # Of course, Python doesn't do multi-line comments, so this will be extra fun.
 
-# Since this is an IRC client, we need some basic imports.
 # Socket for ... sockets
-# time for sleeping
-# threading for non-concurrent processing (sending and receiving messages)
-# sys for various things like exit
-# os for changing interacting with directories
-# sqlite3 as lite for sqlite...
 import socket
+# time for sleeping
 import time
+# threading for non-concurrent processing (sending and receiving messages)
 import threading
+# sys for various things like exit
 import sys
+# os for changing interacting with directories
 import os
+# sqlite3 as lite for sqlite, our database of choice
 import sqlite3 as lite
+# configparser to parse the glorious config file!
+import configparser
 
 # Now for custom imports.
 # world is the location of all the regular program-wide functions including changrab() and receiver()
-# commands.join for joining the default channel
 import world
-import commands.join
+# # commands.join for joining the default channel
+# import commands.join
 
-# One of these days this will load from a config file, but for the moment we're going to set some global variables.
+# Instantiates ConfigParser() and loads settings.ini
+settings = configparser.ConfigParser()
+settings.read("settings.ini")
+
+# Loaded from settings.ini
 # SERVER = IRC server connecting to.
-# DEFAULTCHANNEL = First room to connect to--essentially a default option. This is to make sure the bot is working and to
-#     issuing other commands.
+# DEFAULTCHANNEL = First room to connect to--essentially a default option. This is to make sure the bot is working and
+#     to issuing other commands.
 # BOTNICK = The bot's nick. What it will be named on the IRC network. By default "Inumuta"
 # PASSWORD = Password to identify the nick with Nickserv, available on most IRC networks.
+SERVER = settings["DEFAULT"]["SERVER"]
+DEFAULTCHANNEL = settings["DEFAULT"]["DEFAULTCHANNEL"]
+BOTNICK = settings["DEFAULT"]["NICK"]
+PASSWORD = settings["DEFAULT"]["PASSWORD"]
+COMMANDCHAR  = ":" + str(settings["DEFAULT"]["COMMANDCHAR"])
+
 # chanlist =  Empty list to store currently-connected channels.
 # threads = Empty list to store the list of current threads.
 # homedir = home directory where inumuta.py is located.
-SERVER = "198.100.123.140"
-DEFAULTCHANNEL = "#HekterBot"
-BOTNICK = "Inumuta"
-PASSWORD = "pancakes"
 chanlist = []
 threads = []
 homedir = str(os.getcwd())
@@ -66,38 +71,42 @@ except Exception as error:
 
 # Now we are going to instantiate a thread to receive all messages and passing it the open socket.
 # This utilizes the receiver() function inside the world import.
-t = threading.Thread(target=world.receiver, args=(ircsock,))
+t = threading.Thread(target=world.receiver, args=(ircsock,homedir,COMMANDCHAR,))
 threads.append(t)
 t.start()
 
 # IRC protocol dicatates we have to identify ourselves with username nonsense.
 # We sleep for two seconds to let the IRC server catch up to us, otherwise we move too fast and stuff gets lost.
-ircsock.send(str.encode("USER " + BOTNICK + " " + BOTNICK + " " + BOTNICK + " :" + BOTNICK + "\r\n"))
+ircsock.send(str.encode("USER " + str(socket.gethostname()) + " " + BOTNICK + " " + BOTNICK  + " :" + BOTNICK + "\r\n"))
 time.sleep(2)
 
 # Next IRC protocol says we need to establish a nickname.
 ircsock.send(str.encode("NICK " + BOTNICK + "\r\n"))
 time.sleep(2)
 
-# # Then we send along the nickserv password to get our permissions and to be identified.
-# ircsock.send(str.encode("NickServ IDENTIFY " + PASSWORD + "\r\n"))
-# time.sleep(2)
+# Skip this step if there is no password
+if PASSWORD == '':
+    pass
+else:
+    # Then we send along the nickserv password to get our permissions and to be identified.
+    ircsock.send(str.encode("NickServ IDENTIFY " + PASSWORD + "\r\n"))
+    time.sleep(2)
 
-# Now we establish a connection to the database.
-con = lite.connect(os.path.join(homedir, "inumuta.db"))
-with con:
-    cur = con.cursor()
-    cur.execute("SELECT * FROM Chans")
-
-    rows = cur.fetchall()
-
-    if rows == []:
-        pass
-    else:
-        for row in rows:
-            world.joinchan(ircsock, row[0], row[1])
-    # for row in rows:
-    #     print(str(row))
+# # Now we establish a connection to the database.
+# con = lite.connect(os.path.join(homedir, "inumuta.db"))
+# with con:
+#     cur = con.cursor()
+#     cur.execute("SELECT * FROM Chans")
+#
+#     rows = cur.fetchall()
+#
+#     if rows == []:
+#         pass
+#     else:
+#         for row in rows:
+#             world.joinchan(ircsock, row[0], row[1])
+#     # for row in rows:
+#     #     print(str(row))
 
 # # Use commands/join.py 's ircJoin command to iterate over existing channels that need to be connected to on "startup"
 # commands.join.ircJoin(ircsock, chan)
