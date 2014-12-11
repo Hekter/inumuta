@@ -16,7 +16,7 @@ def echoToIRC(debugmode, toprint, debugloc, ircsock):
 
 def prompt():
     print('Would you like to invoke DEBUG mode?')
-    DEBUGREPLY = str.lower(input())  # Fuck your upper case in its beady little eyes.
+    DEBUGREPLY = str.lower(input())
     if DEBUGREPLY == 'y' or DEBUGREPLY == 'yes':
         print('DEBUG mode activated.')
         return True
