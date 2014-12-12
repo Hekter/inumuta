@@ -37,6 +37,7 @@ settings.read("settings.ini")
 # PASSWORD = Password to identify the nick with Nickserv, available on most IRC networks.
 SERVER = settings["DEFAULT"]["SERVER"]
 DEFAULTCHANNEL = settings["DEFAULT"]["DEFAULTCHANNEL"]
+DEFAULTCHANNELPW = settings["DEFAULT"]["DEFAULTCHANNELPW"]
 BOTNICK = settings["DEFAULT"]["NICK"]
 PASSWORD = settings["DEFAULT"]["PASSWORD"]
 COMMANDCHAR  = ":" + str(settings["DEFAULT"]["COMMANDCHAR"])
@@ -92,24 +93,19 @@ else:
     ircsock.send(str.encode("NickServ IDENTIFY " + PASSWORD + "\r\n"))
     time.sleep(2)
 
-# # Now we establish a connection to the database.
-# con = lite.connect(os.path.join(homedir, "inumuta.db"))
-# with con:
-#     cur = con.cursor()
-#     cur.execute("SELECT * FROM Chans")
-#
-#     rows = cur.fetchall()
-#
-#     if rows == []:
-#         pass
-#     else:
-#         for row in rows:
-#             world.joinchan(ircsock, row[0], row[1])
-#     # for row in rows:
-#     #     print(str(row))
+# Now we establish a connection to the database.
+con = lite.connect(os.path.join(homedir, "inumuta.db"))
+with con:
+    cur = con.cursor()
+    cur.execute("SELECT * FROM Chans")
 
-# # Use commands/join.py 's ircJoin command to iterate over existing channels that need to be connected to on "startup"
-# commands.join.ircJoin(ircsock, chan)
+    rows = cur.fetchall()
+
+    if rows == []:
+        world.joinChan(ircsock, DEFAULTCHANNEL, DEFAULTCHANNELPW)
+    else:
+        for row in rows:
+            world.joinChan(ircsock, row[0], row[1])
 
 # # Then we join the default channel.
 # join.run(ircsock, DEFAULTCHANNEL)
