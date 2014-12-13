@@ -20,10 +20,8 @@ import sqlite3 as lite
 import configparser
 
 # Now for custom imports.
-# world is the location of all the regular program-wide functions including changrab() and receiver()
+# world is the location of all the regular program-wide functions like receiver()
 import world
-# # commands.join for joining the default channel
-# import commands.join
 
 # Instantiates ConfigParser() and loads settings.ini
 settings = configparser.ConfigParser()
@@ -45,7 +43,6 @@ COMMANDCHAR  = ":" + str(settings["DEFAULT"]["COMMANDCHAR"])
 # chanlist =  Empty list to store currently-connected channels.
 # threads = Empty list to store the list of current threads.
 # homedir = home directory where inumuta.py is located.
-chanlist = []
 threads = []
 homedir = str(os.getcwd())
 
@@ -106,9 +103,5 @@ with con:
     else:
         for row in rows:
             world.joinChan(ircsock, row[0], row[1])
-
-# # Then we join the default channel.
-# join.run(ircsock, DEFAULTCHANNEL)
-# # ircsock.send(str.encode("JOIN " + DEFAULTCHANNEL + "\r\n"))
 
 # The program continues to run inside the receiver() function located in world.
