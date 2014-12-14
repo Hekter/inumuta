@@ -40,7 +40,6 @@ BOTNICK = settings["DEFAULT"]["NICK"]
 PASSWORD = settings["DEFAULT"]["PASSWORD"]
 COMMANDCHAR  = ":" + str(settings["DEFAULT"]["COMMANDCHAR"])
 
-# chanlist =  Empty list to store currently-connected channels.
 # threads = Empty list to store the list of current threads.
 # homedir = home directory where inumuta.py is located.
 threads = []
@@ -103,5 +102,12 @@ with con:
     else:
         for row in rows:
             world.joinChan(ircsock, row[0], row[1])
+
+
+while True:
+    # This allows us to be able to type into the console as it runs. We do need to specify which channel to talk to.
+    # Format is #chanName :text
+    uinput = input()
+    ircsock.send(str.encode("PRIVMSG " + uinput + "\r\n"))
 
 # The program continues to run inside the receiver() function located in world.
