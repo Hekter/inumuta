@@ -102,6 +102,7 @@ with con:
     else:
         for row in rows:
             world.joinChan(ircsock, row[0], row[1])
+            time.sleep(.5)
 
 
 while True:
