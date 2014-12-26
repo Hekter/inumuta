@@ -96,39 +96,45 @@ def receiver(ircsock, homedir, COMMANDCHAR):
             print("PONG " + ircmsg[1])
 
         # If the commandchar is in thar, load it up, yo :D
-        elif COMMANDCHAR in ircmsg[3]:
+        try:
+            # comflag = ircmsg[3]
+            if COMMANDCHAR in ircmsg[3]:
 
-            # Set command var to ircmsg[3][2:] to cutt off the first two characters (colon and commandchar)
-            command = ircmsg[3][2:]
+                # Set command var to ircmsg[3][2:] to cutt off the first two characters (colon and commandchar)
+                command = ircmsg[3][2:]
 
-            # Check to make sure the command is even in the valid command list for import!
-            if command in commands:
-                # Set runcommand to the import of whatever module we've just loaded with the name equalling the command.
-                runcommand = __import__(command)
+                # Check to make sure the command is even in the valid command list for import!
+                if command in commands:
+                    # Set runcommand to the import of whatever module we've just loaded with the name equalling the command.
+                    runcommand = __import__(command)
 
-                # Now invoke that module's run() function and grab whatever it spits back out.
-                returnedVar = runcommand.run(ircsock, ircmsg, homedir)
+                    # Now invoke that module's run() function and grab whatever it spits back out.
+                    returnedVar = runcommand.run(ircsock, ircmsg, homedir)
 
-                # Check to see if the returned variable is the string "broken" which indicates something has gone
-                #     horribly, horribly wrong and the bot needs to shut down now.
-                if returnedVar == "broken":
-                    print("Everything is broken forever.")
-                    sys.exit()
-                elif returnedVar == "invalidArg":
-                    chan = ircmsg[2]
-                    sendmsg(ircsock, chan, "Invalid argument! Check for invalid characters or formatting.\r\n")
+                    # Check to see if the returned variable is the string "broken" which indicates something has gone
+                    #     horribly, horribly wrong and the bot needs to shut down now.
+                    if returnedVar == "broken":
+                        print("Everything is broken forever.")
+                        sys.exit()
+                    elif returnedVar == "invalidArg":
+                        chan = ircmsg[2]
+                        sendmsg(ircsock, chan, "Invalid argument! Check for invalid characters or formatting.\r\n")
+                    else:
+                        pass
+
+                # Now we have some custom, special commands reserved for administrative use.
+                elif command == "reload":
+                    commands = loadCommands(commandpath)
+                elif command == "debug-on":
+                    global DEBUGMODE
+                    DEBUGMODE = True
+                elif command == "debug-off":
+                    global DEBUGMODE
+                    DEBUGMODE = False
+
+                # And if all else fails, we have a command char with an invalid command! We should say something.
                 else:
-                    pass
-
-            # Now we have some custom, special commands reserved for administrative use.
-            elif command == "reload":
-                commands = loadCommands(homedir)
-            elif command == "debug-on":
-                DEBUGMODE = True
-            elif command == "debug-off":
-                DEBUGMODE = False
-
-            # And if all else fails, we have a command char with an invalid command! We should say something.
-            else:
-                chan = ircmsg[2]
-                sendmsg(ircsock, chan, "Invalid command!\r\n")
+                    chan = ircmsg[2]
+                    sendmsg(ircsock, chan, "Invalid command!\r\n")
+        except:
+            pass

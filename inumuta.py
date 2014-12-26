@@ -74,7 +74,7 @@ t.start()
 
 # IRC protocol dicatates we have to identify ourselves with username nonsense.
 # We sleep for two seconds to let the IRC server catch up to us, otherwise we move too fast and stuff gets lost.
-ircsock.send(str.encode("USER " + str(socket.gethostname()) + " " + BOTNICK + " " + BOTNICK  + " :" + BOTNICK + "\r\n"))
+ircsock.send(str.encode("USER " + str(socket.gethostname()) + " 0 * :" + BOTNICK + "Bot\r\n"))
 time.sleep(2)
 
 # Next IRC protocol says we need to establish a nickname.
@@ -102,6 +102,7 @@ with con:
     else:
         for row in rows:
             world.joinChan(ircsock, row[0], row[1])
+            time.sleep(.5)
 
 
 while True:
