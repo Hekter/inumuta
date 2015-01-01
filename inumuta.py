@@ -46,7 +46,7 @@ threads = []
 homedir = str(os.getcwd())
 
 #Now we need to establish whether or not the database exists.
-cwdFileList = os.listdir()
+cwdFileList = os.listdir(homedir)
 if "inumuta.db" not in cwdFileList:
     import setup
     setup.run()
