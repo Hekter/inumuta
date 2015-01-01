@@ -11,9 +11,6 @@ import debugtools as debug
 # Utils for getMsgClass()
 import utils
 
-# Ask the user about wanting to go into debug mode.
-DEBUGMODE = debug.prompt()
-
 # Function looks at the contents of /commands folder and comes out with a list of valid commands therein. This is later
 #     compared against user input to parse what is a valid command or not. This is accessed via the special @reload
 #     command to "refresh" the list of valid commands while the bot is running.
@@ -36,7 +33,6 @@ def loadCommands(commandpath):
             pass
         else:
             commands.append(x.replace(".py", ""))
-    debug.echo(DEBUGMODE, commands, "commands")
     return commands
 
 # Receiver method is instantiated as its own separate thread away from the main process. This processes input
@@ -44,15 +40,15 @@ def loadCommands(commandpath):
 #     it to screen and the log.
 def receiver(connection):
 
-    # Create a commandpath string to the commands folder, wherever we are. This is important for @reload and dynamic
-    #     importing of the actual commands.
+    # Create a commandpath navigation string to the commands folder, wherever we are. This is important for @reload and
+    #     dynamic importing of the actual commands. This is stored inside the connection instance of IRCContext.
     connection.commandpath = os.path.join(connection.homedir, "commands")
 
     # Get a list of valid commands out of the loadCommands() function to check to make sure the command is appropriate.
     valid_commands = loadCommands(connection.commandpath)
-    debug.echo(DEBUGMODE, valid_commands, "valid_commands at top of receiver()")
+    debug.echo(connection.debugmode, valid_commands, "valid_commands at top of receiver()")
 
-    # Append commands folder to the PYTHONPATH
+    # Append commands folder path to the PYTHONPATH
     sys.path.append(connection.commandpath)
 
     # Gotta loop around and around! Not gonna be receiving only one message, after all.
@@ -80,8 +76,8 @@ def receiver(connection):
             pass
 
         # Otherwise, (we know what the command is and it has a class instantiation) we check the class instances'
-        #     'isCommand' variable. If true, we execute its do() function with sockconn, msg, commchar, and commandpath
-        #      as args.
+        #     'isCommand' variable. If true, we execute its do() function and pass in the connection class instance
+        #     of contexts.IRCContext
         else:
             if msgclass.isCommand == True:
                 msgclass.do(connection)
