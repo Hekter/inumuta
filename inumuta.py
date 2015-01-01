@@ -22,8 +22,8 @@ import configparser
 # Now for custom imports.
 # world is the location of all the regular program-wide functions like receiver()
 import world
-# utils for access to various classes :3
-import formats
+# contexts for establishing connection context (irc, web)
+import contexts
 # debugtools for help with debugging!
 import debugtools as debug
 
@@ -76,9 +76,12 @@ except Exception as error:
     print(str(error))
     sys.exit()
 
+# Now we instantiate the formats.ConnectionContext class to pass into world.receiver()
+ConnectionContext = contexts.IRCContext(ircsock, COMMANDCHAR, homedir)
+
 # Now we are going to instantiate a thread to receive all messages and passing it the open socket.
 # This utilizes the receiver() function inside the world import.
-t = threading.Thread(target=world.receiver, args=(ircsock,homedir,COMMANDCHAR,))
+t = threading.Thread(target=world.receiver, args=(ConnectionContext,))
 threads.append(t)
 t.start()
 
