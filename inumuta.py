@@ -102,20 +102,20 @@ else:
     ircsock.send(str.encode("NickServ IDENTIFY " + PASSWORD + "\r\n"))
     time.sleep(2)
 
-# # Now we establish a connection to the database.
-# con = lite.connect(os.path.join(homedir, "inumuta.db"))
-# with con:
-#     cur = con.cursor()
-#     cur.execute("SELECT * FROM Chans")
-#
-#     rows = cur.fetchall()
-#
-#     if rows == []:
-#         world.joinChan(ircsock, DEFAULTCHANNEL, DEFAULTCHANNELPW)
-#     else:
-#         for row in rows:
-#             world.joinChan(ircsock, row[0], row[1])
-#             time.sleep(.5)
+# Now we establish a connection to the database.
+con = lite.connect(os.path.join(homedir, "inumuta.db"))
+with con:
+    cur = con.cursor()
+    cur.execute("SELECT * FROM Chans")
+
+    rows = cur.fetchall()
+
+    if rows == []:
+        ConnectionContext.join_channel(DEFAULTCHANNEL, DEFAULTCHANNELPW)
+    else:
+        for row in rows:
+            ConnectionContext.join_channel(row[0], row[1])
+            time.sleep(.5)
 
 
 while True:
