@@ -1,10 +1,11 @@
 import sys
 
 class IRCContext:
-    def __init__(self, ircsock, comchar, homedir):
+    def __init__(self, ircsock, comchar, homedir, debugmode):
         self.ircsock = ircsock
         self.comchar = comchar
         self.homedir = homedir
+        self.debugmode = debugmode
 
     def send_msg(self, chan, msg):
         try:

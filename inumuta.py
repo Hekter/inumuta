@@ -27,7 +27,7 @@ import contexts
 # debugtools for help with debugging!
 import debugtools as debug
 
-DEBUGMODE = debug.prompt()
+debugmode = debug.prompt()
 
 # Instantiates ConfigParser() and loads settings.ini
 settings = configparser.ConfigParser()
@@ -77,7 +77,7 @@ except Exception as error:
     sys.exit()
 
 # Now we instantiate the formats.ConnectionContext class to pass into world.receiver()
-ConnectionContext = contexts.IRCContext(ircsock, COMMANDCHAR, homedir)
+ConnectionContext = contexts.IRCContext(ircsock, COMMANDCHAR, homedir, debugmode)
 
 # Now we are going to instantiate a thread to receive all messages and passing it the open socket.
 # This utilizes the receiver() function inside the world import.
