@@ -22,10 +22,19 @@ import configparser
 # Now for custom imports.
 # world is the location of all the regular program-wide functions like receiver()
 import world
+# utils for access to various classes :3
+import formats
+# debugtools for help with debugging!
+import debugtools as debug
+
+DEBUGMODE = debug.prompt()
 
 # Instantiates ConfigParser() and loads settings.ini
 settings = configparser.ConfigParser()
 settings.read("settings.ini")
+
+# TO BE REPLACED WITH SELECTION/INPUT/WHATEVER
+settingsProfile = "DEFAULT"
 
 # Loaded from settings.ini
 # SERVER = IRC server connecting to.
@@ -33,12 +42,13 @@ settings.read("settings.ini")
 #     to issuing other commands.
 # BOTNICK = The bot's nick. What it will be named on the IRC network. By default "Inumuta"
 # PASSWORD = Password to identify the nick with Nickserv, available on most IRC networks.
-SERVER = settings["DEFAULT"]["SERVER"]
-DEFAULTCHANNEL = settings["DEFAULT"]["DEFAULTCHANNEL"]
-DEFAULTCHANNELPW = settings["DEFAULT"]["DEFAULTCHANNELPW"]
-BOTNICK = settings["DEFAULT"]["NICK"]
-PASSWORD = settings["DEFAULT"]["PASSWORD"]
-COMMANDCHAR  = ":" + str(settings["DEFAULT"]["COMMANDCHAR"])
+# COMMANDCHAR = Special character at the start of an IRC line that indicates that it is a command.
+SERVER = settings[settingsProfile]["SERVER"]
+DEFAULTCHANNEL = settings[settingsProfile]["DEFAULTCHANNEL"]
+DEFAULTCHANNELPW = settings[settingsProfile]["DEFAULTCHANNELPW"]
+BOTNICK = settings[settingsProfile]["NICK"]
+PASSWORD = settings[settingsProfile]["PASSWORD"]
+COMMANDCHAR  = ":" + str(settings[settingsProfile]["COMMANDCHAR"])
 
 # threads = Empty list to store the list of current threads.
 # homedir = home directory where inumuta.py is located.
