@@ -2,7 +2,9 @@ class Privmsg:
     def __init__(self, msg):
         self.name = 'PRIVMSG'
         self.msg = msg
-        self.isCommand = False
+        self.isCommand = True
+    def do(self, connection):
+        pass
 
 
 class Ping:
