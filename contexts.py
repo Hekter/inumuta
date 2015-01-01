@@ -1,18 +1,22 @@
+import sys
+
 class IRCContext:
-    def __init__(self, sockconn, homedir):
-        self.sockconn = sockconn
+    def __init__(self, ircsock, comchar, homedir, debugmode):
+        self.ircsock = ircsock
+        self.comchar = comchar
         self.homedir = homedir
-        self.connected_chans = []
+        self.debugmode = debugmode
 
-    def getType(self, msg):
-        msgType = msg[1]
+    def send_msg(self, chan, msg):
+        try:
+            self.ircsock.send(str.encode("PRIVMSG " + chan + " :" + msg + "\r\n"))
+        except OSError:
+            print("Unable to send message to socket. Program closing.")
+            sys.exit()
 
-
-    # def argGrabber(self, msg, argNum):
-    #     argResults = []
-    #     for x in range(1, argNum + 1):
-    #         try:
-    #             argResults.append(msg[3 + x])
-    #         except IndexError:
-    #             argResults.append(None)
-    #     return argResults
+    def join_channel(self, chan, pw):
+        try:
+            self.ircsock.send(str.encode("JOIN " + chan + " " + pw + "\r\n"))
+        except OSError:
+            print("Unable to send join message to socket. Program closing.")
+            sys.exit()

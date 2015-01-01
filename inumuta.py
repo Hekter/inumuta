@@ -22,10 +22,19 @@ import configparser
 # Now for custom imports.
 # world is the location of all the regular program-wide functions like receiver()
 import world
+# contexts for establishing connection context (irc, web)
+import contexts
+# debugtools for help with debugging!
+import debugtools as debug
+
+debugmode = debug.prompt()
 
 # Instantiates ConfigParser() and loads settings.ini
 settings = configparser.ConfigParser()
 settings.read("settings.ini")
+
+# TO BE REPLACED WITH SELECTION/INPUT/WHATEVER
+settingsProfile = "DEFAULT"
 
 # Loaded from settings.ini
 # SERVER = IRC server connecting to.
@@ -33,12 +42,13 @@ settings.read("settings.ini")
 #     to issuing other commands.
 # BOTNICK = The bot's nick. What it will be named on the IRC network. By default "Inumuta"
 # PASSWORD = Password to identify the nick with Nickserv, available on most IRC networks.
-SERVER = settings["DEFAULT"]["SERVER"]
-DEFAULTCHANNEL = settings["DEFAULT"]["DEFAULTCHANNEL"]
-DEFAULTCHANNELPW = settings["DEFAULT"]["DEFAULTCHANNELPW"]
-BOTNICK = settings["DEFAULT"]["NICK"]
-PASSWORD = settings["DEFAULT"]["PASSWORD"]
-COMMANDCHAR  = ":" + str(settings["DEFAULT"]["COMMANDCHAR"])
+# COMMANDCHAR = Special character at the start of an IRC line that indicates that it is a command.
+SERVER = settings[settingsProfile]["SERVER"]
+DEFAULTCHANNEL = settings[settingsProfile]["DEFAULTCHANNEL"]
+DEFAULTCHANNELPW = settings[settingsProfile]["DEFAULTCHANNELPW"]
+BOTNICK = settings[settingsProfile]["NICK"]
+PASSWORD = settings[settingsProfile]["PASSWORD"]
+COMMANDCHAR  = ":" + str(settings[settingsProfile]["COMMANDCHAR"])
 
 # threads = Empty list to store the list of current threads.
 # homedir = home directory where inumuta.py is located.
@@ -46,7 +56,7 @@ threads = []
 homedir = str(os.getcwd())
 
 #Now we need to establish whether or not the database exists.
-cwdFileList = os.listdir()
+cwdFileList = os.listdir(homedir)
 if "inumuta.db" not in cwdFileList:
     import setup
     setup.run()
@@ -66,9 +76,12 @@ except Exception as error:
     print(str(error))
     sys.exit()
 
+# Now we instantiate the formats.ConnectionContext class to pass into world.receiver()
+ConnectionContext = contexts.IRCContext(ircsock, COMMANDCHAR, homedir, debugmode)
+
 # Now we are going to instantiate a thread to receive all messages and passing it the open socket.
 # This utilizes the receiver() function inside the world import.
-t = threading.Thread(target=world.receiver, args=(ircsock,homedir,COMMANDCHAR,))
+t = threading.Thread(target=world.receiver, args=(ConnectionContext,))
 threads.append(t)
 t.start()
 
@@ -98,10 +111,10 @@ with con:
     rows = cur.fetchall()
 
     if rows == []:
-        world.joinChan(ircsock, DEFAULTCHANNEL, DEFAULTCHANNELPW)
+        ConnectionContext.join_channel(DEFAULTCHANNEL, DEFAULTCHANNELPW)
     else:
         for row in rows:
-            world.joinChan(ircsock, row[0], row[1])
+            ConnectionContext.join_channel(row[0], row[1])
             time.sleep(.5)
 
 
