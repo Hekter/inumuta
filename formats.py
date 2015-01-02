@@ -2,14 +2,14 @@ import debugtools
 import world
 
 class Privmsg:
-    def __init__(self, msg):
+    def __init__(self, ircmsg):
         self.name = 'PRIVMSG'
-        self.msg = msg
+        self.fullmsg = ircmsg
         self.isCommand = True
     def do(self, connection):
 
         # Reassign msg to just "#chan" and ":text" and "here for the message" strings
-        self.msg = self.msg[2].split(sep=None, maxsplit=2)
+        self.msg = self.fullmsg[2].split(sep=None, maxsplit=2)
         debugtools.echo(connection.debugmode, self.msg, "self.msg after the reassign split shenanigans.")
 
         # Set chan variable to msg[0] which contains where the message came from.
