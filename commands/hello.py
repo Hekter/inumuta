@@ -1,3 +1,3 @@
-def run(connection):
-    connection.ircsock.send(str.encode("PRIVMSG " + connection.chan + " :Hello! I WILL DESTROY YOU.\r\n"))
+def run(connection, privmsg):
+    connection.send_msg(privmsg.chan, "Hello! I WILL DESTROY YOU.")
     return None
