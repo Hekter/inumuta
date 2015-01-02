@@ -51,7 +51,7 @@ def valid_chan(connection, privmsg, input_chan):
             # If we've got an invalid character that is more than 1 pound or not pound at all, return False. Otherwise
             #     move on.
             if pound_count > 1:
-                connection.send(privmsg.chan, "Too many '#'s in channame.")
+                connection.send_msg(privmsg.chan, "Too many '#'s in channame.")
                 return False
             elif pound_count <= 1:
                 pass
@@ -60,4 +60,18 @@ def valid_chan(connection, privmsg, input_chan):
                 return False
 
     # If we somehow survive all that, return True.
+    return True
+
+def valid_pw(connection, privmsg, pw):
+    if pw == "":
+        return True
+    else:
+        pass
+
+    for char in pw:
+        if char not in alphabet:
+            connection.send_msg(privmsg.chan, "Invalid character in given password.")
+            return False
+        else:
+            pass
     return True

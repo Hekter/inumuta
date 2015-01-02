@@ -30,14 +30,12 @@ def run(connection, privmsg):
     if pw == "":
         pw = "NULL"
 
-    # Parse for invalid chars.
+    # Parse for invalid chars. If False is returned (invalid)
     else:
-        for char in pw.lower():
-            if char in utils.alphabet:
-                pass
-            else:
-                connection.send_msg(privmsg.chan, "Invalid character in channel password!")
-                return
+        if utils.valid_pw(connection, privmsg, pw) == True:
+            pass
+        else:
+            return
 
     # With that out of the way, now that we have both chan and the password, let's connect to the database.
     con = lite.connect(os.path.join(connection.homedir, "inumuta.db"))
