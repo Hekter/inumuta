@@ -1,5 +1,7 @@
 import formats
 
+alphabet = "abcdefghijklmnopqrstuvwxyz"
+
 def getMsgClass(msg):
     """START THE IF TREE"""
 
