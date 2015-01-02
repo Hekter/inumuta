@@ -26,6 +26,14 @@ def getMsgClass(msg):
     # We set pound_count to 0 to ... count the # of #s :P We already established above we have at least 1, now to check
     #     and make sure there isn't any more than that.
 def valid_chan(connection, privmsg, input_chan):
+
+    # I should hope this is self-explanatory.
+    if "#" not in input_chan:
+        connection.send_msg(privmsg.chan, "Lacking a # to denote channame!")
+        return False
+    else:
+        pass
+
     pound_count = 0
     for char in input_chan.lower():
         if char in alphabet:
@@ -43,7 +51,7 @@ def valid_chan(connection, privmsg, input_chan):
             # If we've got an invalid character that is more than 1 pound or not pound at all, return False. Otherwise
             #     move on.
             if pound_count > 1:
-                connection.send(privmsg.chan, "Too many #s in channame.")
+                connection.send(privmsg.chan, "Too many '#'s in channame.")
                 return False
             elif pound_count <= 1:
                 pass
