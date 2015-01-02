@@ -3,56 +3,66 @@ import sqlite3 as lite
 # To muck with os.path.join
 import os
 
-# For access to argGrabber
-import world
+# For access to valid_chan
+import utils
 
-def run(ircsock, msg, homedir):
-    # Parse the chan by using the argGrabber (since the channel is technically an argument)
-    # Position here in the message list is 4 since it comes after the command (position 3)
-    # However if it returns nothing (failure condition in this case), return with invalidArg
-    chan = world.argGrabber(msg, 4)
-    if chan == '':
-        return "invalidArg"
+def run(connection, privmsg):
+    # Split up the text from privmsg.post_command_text into a list so that it can be addressed one word at a time.
+    # However, if the string is empty, set to an empty string. Otherwise, input_chan will match msg[0].
+    msg = privmsg.post_command_text.split()
+    try:
+        input_chan = msg[0]
+    except IndexError:
+        input_chan = ""
+
+    # If the input chan is blank, throw a ValueError (not enough values to resolve, throws it up to privmsg handler)
+    if input_chan == '':
+        raise ValueError
+    elif "#" not in input_chan:
+        connection.send_msg(privmsg.chan, "Lacking a # to denote channame!")
+        return
     else:
         pass
 
-    # Now we make sure there aren't any invalid characters in our chan var :3
-    for char in chan:
-        if char in world.VALIDCHARS:
-            pass
-        else:
-            return "invalidArg"
+    if utils.valid_chan(connection, privmsg, input_chan) == True:
+        pass
+    else:
+        return
 
-    # Now to grab the password! It'll be in position 5 if there is one.
-    pw = world.argGrabber(msg, 5)
+    # Now to grab the password... potentially. Basically the same shit as with grabbing the chan earlier.
+    try:
+        pw = msg[1]
+    except IndexError:
+        pw = ""
 
     # Prep password for insertion into the SQL database. If it's blank (no password) convert to NULL string for SQL.
-    if pw == '':
+    if pw == "":
         pw = "NULL"
 
     # Parse for invalid chars.
     else:
-        for char in pw:
-            if char in world.VALIDCHARS:
+        for char in pw.lower():
+            if char in utils.alphabet:
                 pass
             else:
-                return "invalidArg"
+                connection.send_msg(privmsg.chan, "Invalid character in channel password!")
+                return
 
     # With that out of the way, now that we have both chan and the password, let's connect to the database.
-    con = lite.connect(os.path.join(homedir, "inumuta.db"))
+    con = lite.connect(os.path.join(connection.homedir, "inumuta.db"))
     with con:
         cur = con.cursor()
 
         # First we have to check to see whether or not the channel already exists in the database. If it doesn't already
         #     exist in the db (returns None), we can continue on.
-        cur.execute("SELECT Name FROM Chans WHERE Name=:ChanName", {"ChanName": chan})
+        cur.execute("SELECT Name FROM Chans WHERE Name=:ChanName", {"ChanName": input_chan})
         con.commit()
 
         # Get the contents of the search. Assuming there's not a horrifying error, there should only be
         #     only one entry of a chan.
         row = cur.fetchone()
         if row == None:
-            cur.execute("INSERT INTO Chans VALUES(:ChanName,:Password)", {"ChanName": chan, "Password": pw})
+            cur.execute("INSERT INTO Chans VALUES(:ChanName,:Password)", {"ChanName": input_chan, "Password": pw})
 
             # Convert back to non-SQL none-value
             if pw == "NULL":
@@ -61,8 +71,9 @@ def run(ircsock, msg, homedir):
                 pass
 
             # Call joinChan() function to actually send the join command to the channel.
-            world.joinChan(ircsock, chan, pw)
+            connection.join_channel(input_chan, pw)
 
         # If it's already there, send message back to original channel (message loc 2) that is already on ajoin.
         else:
-            world.sendmsg(ircsock, world.argGrabber(msg, 2), "Channel already added to auto-join list.")
+            connection.send_msg(privmsg.chan, "Channel already added to auto-join list.")
+            return
