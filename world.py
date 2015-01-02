@@ -45,8 +45,8 @@ def receiver(connection):
     connection.commandpath = os.path.join(connection.homedir, "commands")
 
     # Get a list of valid commands out of the loadCommands() function to check to make sure the command is appropriate.
-    valid_commands = loadCommands(connection.commandpath)
-    debug.echo(connection.debugmode, valid_commands, "valid_commands at top of receiver()")
+    connection.valid_commands = loadCommands(connection.commandpath)
+    debug.echo(connection.debugmode, connection.valid_commands, "connection.valid_commands at top of receiver()")
 
     # Append commands folder path to the PYTHONPATH
     sys.path.append(connection.commandpath)
