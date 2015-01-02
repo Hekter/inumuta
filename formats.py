@@ -29,7 +29,7 @@ class Privmsg:
             #     itself without any added content! E.g. "@hello" would have no msg[2].
             # If nothing there, set to "" (empty string)
             try:
-                self.post_command_text = self.msg[3]
+                self.post_command_text = self.msg[2]
             except IndexError:
                 self.post_command_text = ""
 
