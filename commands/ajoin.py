@@ -8,21 +8,12 @@ import utils
 
 def run(connection, privmsg):
     # Split up the text from privmsg.post_command_text into a list so that it can be addressed one word at a time.
-    # However, if the string is empty, set to an empty string. Otherwise, input_chan will match msg[0].
+    # However, if there is no chan argument, raise ValueError exception to be handled in privmsg.
     msg = privmsg.post_command_text.split()
     try:
         input_chan = msg[0]
     except IndexError:
-        input_chan = ""
-
-    # If the input chan is blank, throw a ValueError (not enough values to resolve, throws it up to privmsg handler)
-    if input_chan == '':
         raise ValueError
-    elif "#" not in input_chan:
-        connection.send_msg(privmsg.chan, "Lacking a # to denote channame!")
-        return
-    else:
-        pass
 
     if utils.valid_chan(connection, privmsg, input_chan) == True:
         pass
