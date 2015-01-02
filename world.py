@@ -33,7 +33,7 @@ def loadCommands(commandpath):
             pass
         else:
             commands.append(x.replace(".py", ""))
-    print(str("Valid commands: " + commands))
+    print("Valid commands: " + str(commands))
     return commands
 
 # Receiver method is instantiated as its own separate thread away from the main process. This processes input
