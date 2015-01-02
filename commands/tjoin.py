@@ -1,33 +1,30 @@
-import world
+import utils
 
-def run(ircsock, msg, homedir):
-    chan = world.argGrabber(msg, 4)
-    if chan == '':
-        return "invalidArg"
-    else:
-        pass
+def run(connection, privmsg):
+    # Set the channame to the first word after the command string.
+    msg = privmsg.post_command_text.split()
+
+    try:
+        input_chan = msg[0]
+    except IndexError:
+        raise ValueError
 
     # Now we make sure there aren't any invalid characters in our chan var :3
-    for char in chan:
-        if char in world.VALIDCHARS:
-            pass
-        else:
-            return "invalidArg"
-
-    # Now to grab the password! It'll be in position 5 if there is one.
-    pw = world.argGrabber(msg, 5)
-
-    # Prep password for insertion into the SQL database. If it's blank (no password) convert to NULL string for SQL.
-    if pw == '':
+    if utils.valid_chan(connection, privmsg, input_chan) == True:
         pass
-
-    # Parse for invalid chars.
     else:
-        for char in pw:
-            if char in world.VALIDCHARS:
-                pass
-            else:
-                return "invalidArg"
+        return
+
+    # Now to grab the password! It'll be in position 1 if there is one.
+    try:
+        pw = msg[1]
+    except IndexError:
+        pw = ""
+
+    if utils.valid_pw(connection, privmsg, pw) == True:
+        pass
+    else:
+        return
 
     # Call joinChan() function to actually send the join command to the channel.
-    world.joinChan(ircsock, chan, pw)
+    connection.join_channel(input_chan, pw)
