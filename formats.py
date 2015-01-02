@@ -33,8 +33,8 @@ class Privmsg:
 
                 try:
                     runcommand.run(connection, self)
-                except:
-                    pass
+                except ValueError:
+                    connection.send_msg(self.chan,"Too few arguments. Unable to execute " + command + " command.")
 
             # Now check for special, built-in commands.
             elif command == "reload":
@@ -46,7 +46,7 @@ class Privmsg:
             else:
                 connection.send_msg(self.chan, "Invalid command!")
         else:
-            return
+            pass
 
 
 class Ping:
