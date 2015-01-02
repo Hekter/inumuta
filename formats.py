@@ -56,6 +56,7 @@ class Ping:
         self.isCommand = True
     def do(self, connection):
         connection.ircsock.send(str.encode("PONG " + self.msg[1] + "\r\n"))
+        print("PONG " + self.msg[1])
 
 
 # class Join:
