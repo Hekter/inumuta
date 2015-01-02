@@ -25,6 +25,14 @@ class Privmsg:
             command = self.msg[1][2:].lower()
             debugtools.echo(connection.debugmode, command, "command inside the if.")
 
+            # Now we parse out the "text" after a command. This is in a try because it could be just the command
+            #     itself without any added content! E.g. "@hello" would have no msg[2].
+            # If nothing there, set to "" (empty string)
+            try:
+                self.post_command_text = self.msg[3]
+            except IndexError:
+                self.post_command_text = ""
+
             # Check and see if the valid command is in valid_commands
             if command in connection.valid_commands:
 
