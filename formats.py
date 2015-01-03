@@ -2,14 +2,14 @@ import debugtools
 import world
 
 class Privmsg:
-    def __init__(self, msg):
+    def __init__(self, ircmsg):
         self.name = 'PRIVMSG'
-        self.msg = msg
+        self.fullmsg = ircmsg
         self.isCommand = True
     def do(self, connection):
 
         # Reassign msg to just "#chan" and ":text" and "here for the message" strings
-        self.msg = self.msg[2].split(sep=None, maxsplit=2)
+        self.msg = self.fullmsg[2].split(sep=None, maxsplit=2)
         debugtools.echo(connection.debugmode, self.msg, "self.msg after the reassign split shenanigans.")
 
         # Set chan variable to msg[0] which contains where the message came from.
@@ -25,6 +25,14 @@ class Privmsg:
             command = self.msg[1][2:].lower()
             debugtools.echo(connection.debugmode, command, "command inside the if.")
 
+            # Now we parse out the "text" after a command. This is in a try because it could be just the command
+            #     itself without any added content! E.g. "@hello" would have no msg[2].
+            # If nothing there, set to "" (empty string)
+            try:
+                self.post_command_text = self.msg[2]
+            except IndexError:
+                self.post_command_text = ""
+
             # Check and see if the valid command is in valid_commands
             if command in connection.valid_commands:
 
@@ -33,8 +41,8 @@ class Privmsg:
 
                 try:
                     runcommand.run(connection, self)
-                except:
-                    pass
+                except ValueError:
+                    connection.send_msg(self.chan,"Too few arguments. Unable to execute " + command + " command.")
 
             # Now check for special, built-in commands.
             elif command == "reload":
@@ -46,7 +54,7 @@ class Privmsg:
             else:
                 connection.send_msg(self.chan, "Invalid command!")
         else:
-            return
+            pass
 
 
 class Ping:
@@ -56,6 +64,7 @@ class Ping:
         self.isCommand = True
     def do(self, connection):
         connection.ircsock.send(str.encode("PONG " + self.msg[1] + "\r\n"))
+        print("PONG " + self.msg[1])
 
 
 # class Join:
