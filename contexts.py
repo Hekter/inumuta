@@ -20,3 +20,10 @@ class IRCContext:
         except OSError:
             print("Unable to send join message to socket. Program closing.")
             sys.exit()
+
+    def names_request(self, chan):
+        try:
+            self.ircsock.send(str.encode("NAMES " + chan))
+        except OSError:
+            print("Unable to send names command request. Program closing.")
+            sys.exit()
