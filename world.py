@@ -62,13 +62,6 @@ def receiver(connection):
         # FOR FUTURE: QUIET MODE
         print(ircmsg)
 
-        # Now we take the message and convert it to a list. This list is the first two elements (hostname, command)
-        #     and then the rest of the message. E.g.; 'pancakes are the tits, yo' becomes
-        #     ['pancakes', 'are', 'the tits, yo']
-        # 'None' separator specifies using a special algorithm to split on consecutive whitespace and to
-        #     trim trailing space
-        ircmsg = ircmsg.split(sep=None, maxsplit=2)
-
         # Call utils.getMsgClass() to instantiate the class of the message. See utils.py for more on this.
         msgclass = utils.getMsgClass(ircmsg)
 

@@ -3,7 +3,13 @@ import formats
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
 def getMsgClass(msg):
-    """START THE IF TREE"""
+
+    # Now we take the message and convert it to a list. This list is the first two elements (hostname, command)
+    #     and then the rest of the message. E.g.; 'pancakes are the tits, yo' becomes
+    #     ['pancakes', 'are', 'the tits, yo']
+    # 'None' separator specifies using a special algorithm to split on consecutive whitespace and to
+    #     trim trailing space
+    msg = msg.split(sep=None, maxsplit=2)
 
     # Now we start a big ole if tree to find out if the message is a type we care about / can handle.
     # If so, we instantiate its class which contains how to do what it needs.
