@@ -23,7 +23,7 @@ class IRCContext:
 
     def names_request(self, chan):
         try:
-            self.ircsock.send(str.encode("NAMES " + chan))
+            self.ircsock.send(str.encode("NAMES " + chan + "\r\n"))
         except OSError:
             print("Unable to send names command request. Program closing.")
             sys.exit()
