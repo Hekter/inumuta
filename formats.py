@@ -46,6 +46,8 @@ class Privmsg:
                     runcommand.run(connection, self)
                 except ValueError:
                     connection.send_msg(self.chan,"Too few arguments. Unable to execute " + command + " command.")
+                except OSError:
+                    raise
 
             # Now check for special, built-in commands.
             elif command == "reload":

@@ -81,6 +81,9 @@ def receiver(connection):
         #     of contexts.IRCContext
         else:
             if msgclass.isCommand == True:
-                msgclass.do(connection)
+                try:
+                    msgclass.do(connection)
+                except OSError:
+                    sys.exit()
             else:
                 pass
