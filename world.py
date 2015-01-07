@@ -41,6 +41,9 @@ def loadCommands(commandpath):
 #     it to screen and the log.
 def receiver(connection):
 
+    # Needed for later.
+    partialmessage = ""
+
     # Create a commandpath navigation string to the commands folder, wherever we are. This is important for @reload and
     #     dynamic importing of the actual commands. This is stored inside the connection instance of IRCContext.
     connection.commandpath = os.path.join(connection.homedir, "commands")
@@ -56,27 +59,37 @@ def receiver(connection):
     while True:
         # Recieve up to 1kb of data from the socket!
         # Why 1kb? Why not. Better to go too large than too small, right?
-        ircmsg = bytes.decode(connection.ircsock.recv(1024)).strip('\n\r')
+        ircmsg = bytes.decode(connection.ircsock.recv(1024))
 
         # No matter what we want to be printing what we receive to the screen.
         # FOR FUTURE: QUIET MODE
         print(ircmsg)
 
-        # Call utils.getMsgClass() to instantiate the class of the message. See utils.py for more on this.
-        msgclass = utils.getMsgClass(ircmsg)
-
-        # If it returns None (msg not recognized and/or we don't care about what it is) pass and loop around to top.
-        if msgclass is None:
-            pass
-
-        # Otherwise, (we know what the command is and it has a class instantiation) we check the class instances'
-        #     'isCommand' variable. If true, we execute its do() function and pass in the connection class instance
-        #     of contexts.IRCContext
-        else:
-            if msgclass.isCommand == True:
-                try:
-                    msgclass.do(connection)
-                except OSError:
-                    sys.exit()
+        while True:
+            ircmsg = partialmessage + ircmsg
+            partition = ircmsg.partition("\r\n")
+            print(str(partition))
+            if partition[1] == "":
+                partialmessage = partition[0]
+                break
             else:
-                pass
+                # Call utils.getMsgClass() to instantiate the class of the message. See utils.py for more on this.
+                msgclass = utils.getMsgClass(partition[0])
+
+                # If it returns None (msg not recognized and/or we don't care about what it is) pass and
+                #     loop around to top.
+                if msgclass is None:
+                    pass
+
+                # Otherwise, (we know what the command is and it has a class instantiation) we check the class
+                #     instances' 'isCommand' variable. If true, we execute its do() function and pass in the
+                #     connection class instance of contexts.IRCContext
+                else:
+                    if msgclass.isCommand == True:
+                        try:
+                            msgclass.do(connection)
+                        except OSError:
+                            sys.exit()
+                    else:
+                        pass
+                ircmsg = partition[2]
