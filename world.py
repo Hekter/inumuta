@@ -72,8 +72,6 @@ def receiver(connection):
             if partition[1] == "":
                 partialmessage = partition[0]
                 break
-            elif partition[2] == "":
-                partialmessage = ""
             else:
                 # Call utils.getMsgClass() to instantiate the class of the message. See utils.py for more on this.
                 msgclass = utils.getMsgClass(partition[0])
@@ -94,4 +92,7 @@ def receiver(connection):
                             sys.exit()
                     else:
                         pass
-                ircmsg = partition[2]
+                if partition[2] == "" and partialmessage != "":
+                    partialmessage = ""
+                else:
+                    ircmsg = partition[2]
