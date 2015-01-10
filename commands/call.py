@@ -52,12 +52,14 @@ def run(connection, privmsg):
                     nicks = msg.get_nicks()
                     debug.echo(connection.debugmode, nicks, "nicks inside elif code353")
                     nick_dict[nicklist_count] = nicks
+                    debug.echo(connection.debugmode, nick_dict, "nick_dict")
                     # Increment counter by 1.
                     nicklist_count += 1
                 elif msg.name == "PRIVMSG":
                     connection.send_msg(privmsg.get_chan(), "I'm busy at the moment with another command! Try again in a jiffy!")
                     break
                 elif msg.name == "Code366":
+                    debug.echo(connection.debugmode, list(nick_dict.values()), "list(nick_dict.values())")
                     for x in list(nick_dict.values()):
                         try:
                             connection.send_msg(privmsg.chan, x)
