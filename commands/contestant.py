@@ -6,6 +6,8 @@ import random
 
 def run(connection, privmsg):
 
+    banned_nicks = ["Hekter", "DaveGulya", "Inumuta"]
+
     instance_random = random.Random()
 
     nick_dict = {}
@@ -63,11 +65,16 @@ def run(connection, privmsg):
                         for y in nicksplit:
                             nicks.append(y)
 
-                    nick_id = instance_random.randint(0, (len(nicks) - 1))
-                    selected_nick = nicks[nick_id]
-
+                    # This prevents @contestant from selecting "banned" nicks, or those ineligible.
+                    while True:
+                        nick_id = instance_random.randint(0, (len(nicks) - 1))
+                        selected_nick = nicks[nick_id]
+                        if selected_nick in banned_nicks:
+                            pass
+                        else:
+                            break
                     try:
-                        connection.send_msg(privmsg.chan, selected_nick + ", you're our lucky contestant today!")
+                        connection.send_msg(privmsg.chan, "Congratulations" + selected_nick + ", you're our lucky contestant today!")
                     except OSError:
                         raise
                     break
