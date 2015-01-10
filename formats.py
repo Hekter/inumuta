@@ -1,5 +1,4 @@
 import debugtools
-import world
 
 class Privmsg:
     def __init__(self, ircmsg):
@@ -48,14 +47,6 @@ class Privmsg:
                     connection.send_msg(self.chan,"Too few arguments. Unable to execute " + command + " command.")
                 except OSError:
                     raise
-
-            # Now check for special, built-in commands.
-            elif command == "reload":
-                connection.valid_commands = world.loadCommands(connection.commandpath)
-            elif command == "debug-on":
-                connection.debugmode = True
-            elif command == "debug-off":
-                connection.debugmode = False
             else:
                 connection.send_msg(self.chan, "Invalid command!")
         else:
