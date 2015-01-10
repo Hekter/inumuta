@@ -5,9 +5,6 @@ import utils
 import debugtools as debug
 
 def run(connection, privmsg):
-    connection.send_msg(privmsg.chan, "No.")
-
-def NOPE(connection, privmsg):
     # Empty dictionary for nicks to be added to later.
     nick_dict = {}
 
