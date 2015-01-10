@@ -26,8 +26,7 @@ def NOPE(connection, privmsg):
         nicklist_count = 1
         # Wait for a response...
         try:
-            # ircmsg = bytes.decode(connection.ircsock.recv(1024)).strip('\n\r')
-            ircmsg = bytes.decode(connection.ircsock.recv(1024)).strip('\n\r')
+            ircmsg = bytes.decode(connection.ircsock.recv(1024))
         except OSError:
             print("Unable to receive message on socket. Exiting.")
             raise
