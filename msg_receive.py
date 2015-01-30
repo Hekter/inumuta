@@ -64,19 +64,19 @@ def receiver(connection):
                 #     connection class instance of contexts.IRCContext
                 else:
 
-                    # Check to see if the process queue is empty.
-                    if connection.processQ == []:
-                        pass
-                    else:
-                        for queued_item in connection.processQ:
+                    for queued_item in connection.processQ:
 
-                            # If not empty, see if the item we've received matches what is being waited for on the Q
-                            if msgclass.name in queued_item.activate_on:
+                        # If not empty, see if the item we've received matches what is being waited for on the Q
+                        if msgclass.name in queued_item.activate_on:
 
-                                # If it matches up with what we're waiting for, run the run() therein!
-                                queued_item.run(connection, msgclass)
-                            else:
-                                pass
+                            # If it matches up with what we're waiting for, run the run() therein!
+                            queued_item.run(connection, msgclass)
+                        else:
+                            pass
+
+                    # "filters" through the list and removes anything that is finished, returning a cleaned list
+                    connection.processQ = list(filter((lambda x: not x.finished), connection.processQ))
+
 
 
                     if msgclass.isCommand == True:
