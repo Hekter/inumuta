@@ -61,14 +61,16 @@ def receiver(connection):
         # Why 1kb? Why not. Better to go too large than too small, right?
         ircmsg = bytes.decode(connection.ircsock.recv(1024))
 
-        # No matter what we want to be printing what we receive to the screen.
-        # FOR FUTURE: QUIET MODE
-        print(ircmsg)
+        # Depending on quiet/headless mode we want to print to the screen if applicable. (quiet != true)
+        if connection.quiet_mode == True:
+            pass
+        else:
+            print(ircmsg)
 
         while True:
             ircmsg = partialmessage + ircmsg
             partition = ircmsg.partition("\r\n")
-            print(str(partition))
+            debug.echo(connection.debugmode, str(partition), "msg partition")
             if partition[1] == "":
                 partialmessage = partition[0]
                 break
