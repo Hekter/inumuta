@@ -1,5 +1,7 @@
 import formats
 
+import os
+
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
 # Function looks at the contents of /commands folder and comes out with a list of valid commands therein. This is later
