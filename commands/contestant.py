@@ -1,23 +1,21 @@
-# A command to highlight the names of everyone in channel and display a message for them to see.
-
-import utils
-
 import debugtools as debug
+import utils
+import random
+
+# Woooo! Gaming functionality.
 
 def run(connection, privmsg):
-    # Empty dictionary for nicks to be added to later.
+
+    instance_random = random.Random()
+
     nick_dict = {}
 
-    # partialmessage is set to blank for the moment as it's only used lower.
     partialmessage = ""
-    # calltext (what we're going to yell at everyone after we ping them) is everything after the @call!
-    calltext = privmsg.post_command_text
-    debug.echo(connection.debugmode, calltext, "calltext inside run() in call.py")
 
-    # Then we send a NAMES request to the IRC server.
+    # Send the names request!
     connection.names_request(privmsg.chan)
-    debug.echo(connection.debugmode, privmsg.chan, "privmsg.chan inside run() in call.py")
 
+    # BJLEGH
     while True:
         # Need a counter to assign keys to the dictionary! Starting at 1 because why not.
         nicklist_count = 1
@@ -59,14 +57,18 @@ def run(connection, privmsg):
                     connection.send_msg(privmsg.get_chan(), "I'm busy at the moment with another command! Try again in a jiffy!")
                     break
                 elif msg.name == "Code366":
-                    debug.echo(connection.debugmode, list(nick_dict.values()), "list(nick_dict.values())")
                     for x in list(nick_dict.values()):
-                        try:
-                            connection.send_msg(privmsg.chan, x)
-                        except OSError:
-                            raise
+                        nicks = []
+                        nicksplit = x.split()
+                        for y in nicksplit:
+                            nicks.append(y)
+
+                    debug.echo(connection.debugmode, nicks, "nicks")
+                    nick_id = instance_random.randint(0, (len(nicks) - 1))
+                    selected_nick = nicks[nick_id]
+
                     try:
-                        connection.send_msg(privmsg.chan, calltext)
+                        connection.send_msg(privmsg.chan, selected_nick + ", you're our lucky contestant today!")
                     except OSError:
                         raise
                     break
@@ -74,5 +76,3 @@ def run(connection, privmsg):
                     pass
             ircmsg = partition[2]
         break
-
-    return

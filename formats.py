@@ -1,12 +1,14 @@
 import debugtools
-import world
 
 class Privmsg:
     def __init__(self, ircmsg):
         self.name = 'PRIVMSG'
         self.fullmsg = ircmsg
         self.isCommand = True
+
     def do(self, connection):
+
+        self.chan = self.get_chan()
 
         # Reassign msg to just "#chan" and ":text" and "here for the message" strings
         self.msg = self.fullmsg[2].split(sep=None, maxsplit=2)
@@ -43,18 +45,20 @@ class Privmsg:
                     runcommand.run(connection, self)
                 except ValueError:
                     connection.send_msg(self.chan,"Too few arguments. Unable to execute " + command + " command.")
-
-            # Now check for special, built-in commands.
-            elif command == "reload":
-                connection.valid_commands = world.loadCommands(connection.commandpath)
-            elif command == "debug-on":
-                connection.debugmode = True
-            elif command == "debug-off":
-                connection.debugmode = False
+                except OSError:
+                    raise
             else:
                 connection.send_msg(self.chan, "Invalid command!")
         else:
             pass
+
+    def get_chan(self):
+        # Reassign msg to just "#chan" and ":text" and "here for the message" strings
+        self.msg = self.fullmsg[2].split(sep=None, maxsplit=2)
+
+        # Set chan variable to msg[0] which contains where the message came from.
+        chan = self.msg[0]
+        return chan
 
 
 class Ping:
@@ -80,8 +84,21 @@ class Ping:
 class code353:
     def __init__(self, msg):
         self.name = 'Code353'
+        self.msg = msg
+        self.isCommand = False
+
+    def get_nicks(self):
+        # COMPOUND STATEMENT FOR THE WIN.
+        # Okay, everything after the "353" is located in [2], which contains some extra crap we don't care much about.
+        # Then we separate the wheat from the chaff by separating on the colon. Everything after that [1] is nicks.
+        # THEN we have to strip all the extra bullshit (rankings) out.
+        # THEN we... no we're good, actually.
+        nicks = self.msg[2].split(sep=":")[1].replace("~","").replace("&","").replace("@","").replace("#","").replace("+", "")
+        return nicks
 
 
 class code366:
     def __init__(self, msg):
         self.name = 'Code366'
+        self.msg = msg
+        self.isCommand = False

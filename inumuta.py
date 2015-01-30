@@ -21,7 +21,7 @@ import configparser
 
 # Now for custom imports.
 # world is the location of all the regular program-wide functions like receiver()
-import world
+import msg_receive
 # contexts for establishing connection context (irc, web)
 import contexts
 # debugtools for help with debugging!
@@ -49,6 +49,15 @@ DEFAULTCHANNELPW = settings[settingsProfile]["DEFAULTCHANNELPW"]
 BOTNICK = settings[settingsProfile]["NICK"]
 PASSWORD = settings[settingsProfile]["PASSWORD"]
 COMMANDCHAR  = ":" + str(settings[settingsProfile]["COMMANDCHAR"])
+QUIET_MODE = settings[settingsProfile]["QUIET_MODE"]
+
+# Set QUIET_MODE to a boolean value.
+if QUIET_MODE.lower() == "true":
+    QUIET_MODE = True
+else:
+    QUIET_MODE = False
+
+debug.echo(debugmode, str(QUIET_MODE), "quiet mode")
 
 # threads = Empty list to store the list of current threads.
 # homedir = home directory where inumuta.py is located.
@@ -77,11 +86,11 @@ except Exception as error:
     sys.exit()
 
 # Now we instantiate the formats.ConnectionContext class to pass into world.receiver()
-ConnectionContext = contexts.IRCContext(ircsock, COMMANDCHAR, homedir, debugmode)
+ConnectionContext = contexts.IRCContext(ircsock, COMMANDCHAR, homedir, debugmode, QUIET_MODE)
 
 # Now we are going to instantiate a thread to receive all messages and passing it the open socket.
 # This utilizes the receiver() function inside the world import.
-t = threading.Thread(target=world.receiver, args=(ConnectionContext,))
+t = threading.Thread(target=msg_receive.receiver, args=(ConnectionContext,))
 threads.append(t)
 t.start()
 
