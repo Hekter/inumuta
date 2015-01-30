@@ -11,30 +11,6 @@ import debugtools as debug
 # Utils for getMsgClass()
 import utils
 
-# Function looks at the contents of /commands folder and comes out with a list of valid commands therein. This is later
-#     compared against user input to parse what is a valid command or not. This is accessed via the special @reload
-#     command to "refresh" the list of valid commands while the bot is running.
-def loadCommands(commandpath):
-
-    # Empty commands list to store commands as they get appended in.
-    commands = []
-
-    # [Temporarily] grab the list of crap inside commands
-    try:
-        tempdirlist = os.listdir(commandpath)
-    except FileNotFoundError:
-        print("Commands folder not found. Check filesystem and install documentation.")
-        sys.exit()
-
-    # Iterate over the items inside dirlist and append them to commands
-    # We want to ignore __init__.py and __pycache__ since that's gonna make things... weird if we try to import them.
-    for x in tempdirlist:
-        if x == "__init__.py" or x == "__pycache__":
-            pass
-        else:
-            commands.append(x.replace(".py", ""))
-    print("Valid commands: " + str(commands))
-    return commands
 
 # Receiver method is instantiated as its own separate thread away from the main process. This processes input
 #     and figures out what to do with it! Be it a command that launches a /commands script, or just needs to print
@@ -49,7 +25,7 @@ def receiver(connection):
     connection.commandpath = os.path.join(connection.homedir, "commands")
 
     # Get a list of valid commands out of the loadCommands() function to check to make sure the command is appropriate.
-    connection.valid_commands = loadCommands(connection.commandpath)
+    connection.valid_commands = utils.loadCommands(connection.commandpath)
     debug.echo(connection.debugmode, connection.valid_commands, "connection.valid_commands at top of receiver()")
 
     # Append commands folder path to the PYTHONPATH
@@ -92,17 +68,15 @@ def receiver(connection):
                     if connection.processQ == []:
                         pass
                     else:
+                        for queued_item in connection.processQ:
 
-                        # If not empty, see if the item we've received matches what is being waited for on the Q
-                        if msgclass.name in connection.processQ[0].activate_on:
+                            # If not empty, see if the item we've received matches what is being waited for on the Q
+                            if msgclass.name in queued_item.activate_on:
 
-                            # If it matches up with what we're waiting for, run the run() therein!
-                            connection.processQ[0].run(connection, msgclass)
-
-                            # Delete the process so we don't hit it again and again.
-                            del connection.processQ[0]
-                        else:
-                            pass
+                                # If it matches up with what we're waiting for, run the run() therein!
+                                queued_item.run(connection, msgclass)
+                            else:
+                                pass
 
 
                     if msgclass.isCommand == True:

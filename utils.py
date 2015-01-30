@@ -2,6 +2,31 @@ import formats
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
+# Function looks at the contents of /commands folder and comes out with a list of valid commands therein. This is later
+#     compared against user input to parse what is a valid command or not. This is accessed via the special @reload
+#     command to "refresh" the list of valid commands while the bot is running.
+def loadCommands(commandpath):
+
+    # Empty commands list to store commands as they get appended in.
+    commands = []
+
+    # [Temporarily] grab the list of crap inside commands
+    try:
+        tempdirlist = os.listdir(commandpath)
+    except FileNotFoundError:
+        print("Commands folder not found. Check filesystem and install documentation.")
+        sys.exit()
+
+    # Iterate over the items inside dirlist and append them to commands
+    # We want to ignore __init__.py and __pycache__ since that's gonna make things... weird if we try to import them.
+    for x in tempdirlist:
+        if x == "__init__.py" or x == "__pycache__":
+            pass
+        else:
+            commands.append(x.replace(".py", ""))
+    print("Valid commands: " + str(commands))
+    return commands
+
 def getMsgClass(msg):
 
     # Now we take the message and convert it to a list. This list is the first two elements (hostname, command)
