@@ -8,6 +8,9 @@ class IRCContext:
         self.debugmode = debugmode
         self.quiet_mode = quiet_mode
 
+        # Empty "queue"-style list but named processQ because "queue" is impossible to spell.
+        self.processQ = []
+
     def send_msg(self, chan, msg):
         try:
             self.ircsock.send(str.encode("PRIVMSG " + chan + " :" + msg + "\r\n"))

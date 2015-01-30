@@ -87,6 +87,24 @@ def receiver(connection):
                 #     instances' 'isCommand' variable. If true, we execute its do() function and pass in the
                 #     connection class instance of contexts.IRCContext
                 else:
+
+                    # Check to see if the process queue is empty.
+                    if connection.processQ == []:
+                        pass
+                    else:
+
+                        # If not empty, see if the item we've received matches what is being waited for on the Q
+                        if msgclass.name in connection.processQ[0].activate_on:
+
+                            # If it matches up with what we're waiting for, run the run() therein!
+                            connection.processQ[0].run(connection, msgclass)
+
+                            # Delete the process so we don't hit it again and again.
+                            del connection.processQ[0]
+                        else:
+                            pass
+
+
                     if msgclass.isCommand == True:
                         try:
                             msgclass.do(connection)
