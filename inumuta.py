@@ -33,7 +33,7 @@ debugmode = debug.prompt()
 settings = configparser.ConfigParser()
 settings.read("settings.ini")
 
-# TO BE REPLACED WITH SELECTION/INPUT/WHATEVER
+# TODO: Make this dynamic.
 settingsProfile = "DEFAULT"
 
 # Loaded from settings.ini
@@ -43,6 +43,7 @@ settingsProfile = "DEFAULT"
 # BOTNICK = The bot's nick. What it will be named on the IRC network. By default "Inumuta"
 # PASSWORD = Password to identify the nick with Nickserv, available on most IRC networks.
 # COMMANDCHAR = Special character at the start of an IRC line that indicates that it is a command.
+# QUIET_MODE = Determines whether or not all the received messages are output to the terminal after running the script.
 SERVER = settings[settingsProfile]["SERVER"]
 DEFAULTCHANNEL = settings[settingsProfile]["DEFAULTCHANNEL"]
 DEFAULTCHANNELPW = settings[settingsProfile]["DEFAULTCHANNELPW"]
