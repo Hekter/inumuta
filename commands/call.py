@@ -28,6 +28,12 @@ class Call:
 
     def run(self, connection, received_message):
 
+        # Check to see if the received message packet has the chan that we are looking for!
+        if received_message.get_chan() != self.chan:
+            return
+        else:
+            pass
+
         if received_message.name == "Code353":
             self.code353(connection, received_message)
         elif received_message.name == "Code366":

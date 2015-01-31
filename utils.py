@@ -47,10 +47,10 @@ def getMsgClass(msg):
         msgtype = formats.Ping(msg)
         return msgtype
     elif msg[1] == '353':
-        msgtype = formats.code353(msg)
+        msgtype = formats.Code353(msg)
         return msgtype
     elif msg[1] == '366':
-        msgtype = formats.code366(msg)
+        msgtype = formats.Code366(msg)
         return msgtype
     else:
         return None

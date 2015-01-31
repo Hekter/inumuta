@@ -81,7 +81,7 @@ class Ping:
 #         pass
 
 
-class code353:
+class Code353:
     def __init__(self, msg):
         self.name = 'Code353'
         self.msg = msg
@@ -96,9 +96,23 @@ class code353:
         nicks = self.msg[2].split(sep=":")[1].replace("~","").replace("&","").replace("@","").replace("#","").replace("+", "")
         return nicks
 
+    def get_chan(self):
 
-class code366:
+        # msg comes in looking like [":testirc.howett.net", "353", "Inumuta = #ex :Inumuta Hekter"]
+        # Then we split index [2] down based on the equal sign, so it looks like ["Inumuta", "#ex :Inumuta Hekter"]
+        # After that we look at the [1] index item and split that again based on spaces ["#ex", ":Inumuta", "Hekter"]
+        # Then set the chan equal to index [0] to get the chan out.
+        chan = self.msg[2].split(sep="=")[1].split(sep=None)[0]
+        return chan
+
+
+class Code366:
     def __init__(self, msg):
         self.name = 'Code366'
         self.msg = msg
         self.isCommand = False
+
+    def get_chan(self):
+        # msg comes in looking like [":testirc.howett.net", "366", "Inumuta #ex :End of /NAMES list."]
+        # Then we split msg[2] on spaces (None) to get the chan out which as at index [1]
+        chan = self.msg[2].split(sep=None)[1]
