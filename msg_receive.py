@@ -77,8 +77,6 @@ def receiver(connection):
                     # "filters" through the list and removes anything that is finished, returning a cleaned list
                     connection.processQ = list(filter((lambda x: not x.finished), connection.processQ))
 
-
-
                     if msgclass.isCommand == True:
                         try:
                             msgclass.do(connection)

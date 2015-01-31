@@ -10,7 +10,7 @@ class Call:
 
     def __init__(self, calltext, chan):
 
-        # Store the input calltex and incoming chan.
+        # Store the input calltex and incoming chan that we want to hook into.
         self.calltext = calltext
         self.chan = chan
 
