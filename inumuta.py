@@ -105,9 +105,7 @@ ircsock.send(str.encode("NICK " + BOTNICK + "\r\n"))
 time.sleep(2)
 
 # Skip this step if there is no password
-if PASSWORD == '':
-    pass
-else:
+if PASSWORD != '':
     # Then we send along the nickserv password to get our permissions and to be identified.
     ircsock.send(str.encode("NickServ IDENTIFY " + PASSWORD + "\r\n"))
     time.sleep(2)

@@ -64,8 +64,6 @@ def valid_chan(connection, privmsg, input_chan):
     if "#" not in input_chan:
         connection.send_msg(privmsg.chan, "Lacking a # to denote channame!")
         return False
-    else:
-        pass
 
     pound_count = 0
     for char in input_chan.lower():
@@ -78,8 +76,6 @@ def valid_chan(connection, privmsg, input_chan):
             # If it's another sort of invalid character, also return False, but print a different message.
             if char == "#":
                 pound_count += 1
-            else:
-                pass
 
             # If we've got an invalid character that is more than 1 pound or not pound at all, return False. Otherwise
             #     move on.
@@ -98,13 +94,9 @@ def valid_chan(connection, privmsg, input_chan):
 def valid_pw(connection, privmsg, pw):
     if pw == "":
         return True
-    else:
-        pass
 
     for char in pw:
         if char not in alphabet:
             connection.send_msg(privmsg.chan, "Invalid character in given password.")
             return False
-        else:
-            pass
     return True

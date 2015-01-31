@@ -38,9 +38,7 @@ def receiver(connection):
         ircmsg = bytes.decode(connection.ircsock.recv(1024))
 
         # Depending on quiet/headless mode we want to print to the screen if applicable. (quiet != true)
-        if connection.quiet_mode == True:
-            pass
-        else:
+        if connection.quiet_mode == False:
             print(ircmsg)
 
         while True:
