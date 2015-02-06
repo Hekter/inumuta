@@ -1,6 +1,33 @@
 import formats
 
+import os
+
 alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+# Function looks at the contents of /commands folder and comes out with a list of valid commands therein. This is later
+#     compared against user input to parse what is a valid command or not. This is accessed via the special @reload
+#     command to "refresh" the list of valid commands while the bot is running.
+def loadCommands(commandpath):
+
+    # Empty commands list to store commands as they get appended in.
+    commands = []
+
+    # [Temporarily] grab the list of crap inside commands
+    try:
+        tempdirlist = os.listdir(commandpath)
+    except FileNotFoundError:
+        print("Commands folder not found. Check filesystem and install documentation.")
+        sys.exit()
+
+    # Iterate over the items inside dirlist and append them to commands
+    # We want to ignore __init__.py and __pycache__ since that's gonna make things... weird if we try to import them.
+    for x in tempdirlist:
+        if x == "__init__.py" or x == "__pycache__":
+            pass
+        else:
+            commands.append(x.replace(".py", ""))
+    print("Valid commands: " + str(commands))
+    return commands
 
 def getMsgClass(msg):
 
@@ -20,10 +47,10 @@ def getMsgClass(msg):
         msgtype = formats.Ping(msg)
         return msgtype
     elif msg[1] == '353':
-        msgtype = formats.code353(msg)
+        msgtype = formats.Code353(msg)
         return msgtype
     elif msg[1] == '366':
-        msgtype = formats.code366(msg)
+        msgtype = formats.Code366(msg)
         return msgtype
     else:
         return None
@@ -37,8 +64,6 @@ def valid_chan(connection, privmsg, input_chan):
     if "#" not in input_chan:
         connection.send_msg(privmsg.chan, "Lacking a # to denote channame!")
         return False
-    else:
-        pass
 
     pound_count = 0
     for char in input_chan.lower():
@@ -51,8 +76,6 @@ def valid_chan(connection, privmsg, input_chan):
             # If it's another sort of invalid character, also return False, but print a different message.
             if char == "#":
                 pound_count += 1
-            else:
-                pass
 
             # If we've got an invalid character that is more than 1 pound or not pound at all, return False. Otherwise
             #     move on.
@@ -71,13 +94,9 @@ def valid_chan(connection, privmsg, input_chan):
 def valid_pw(connection, privmsg, pw):
     if pw == "":
         return True
-    else:
-        pass
 
     for char in pw:
         if char not in alphabet:
             connection.send_msg(privmsg.chan, "Invalid character in given password.")
             return False
-        else:
-            pass
     return True

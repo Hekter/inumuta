@@ -1,78 +1,80 @@
-# A command to highlight the names of everyone in channel and display a message for them to see.
+# A command to highlight everyone in the channel and display an input message for them to see.
 
 import utils
 
 import debugtools as debug
 
-def run(connection, privmsg):
-    # Empty dictionary for nicks to be added to later.
-    nick_dict = {}
 
-    # partialmessage is set to blank for the moment as it's only used lower.
-    partialmessage = ""
-    # calltext (what we're going to yell at everyone after we ping them) is everything after the @call!
-    calltext = privmsg.post_command_text
-    debug.echo(connection.debugmode, calltext, "calltext inside run() in call.py")
+class Call:
+    # Container class for retaining values needed for calling everything evar!
 
-    # Then we send a NAMES request to the IRC server.
-    connection.names_request(privmsg.chan)
-    debug.echo(connection.debugmode, privmsg.chan, "privmsg.chan inside run() in call.py")
+    def __init__(self, calltext, chan):
 
-    while True:
-        # Need a counter to assign keys to the dictionary! Starting at 1 because why not.
-        nicklist_count = 1
-        # Wait for a response...
+        # Store the input calltex and incoming chan that we want to hook into.
+        self.calltext = calltext
+        self.chan = chan
+
+        # Establish which "classes" of messages we want to act on.
+        self.activate_on = ["Code366", "Code353"]
+
+        # Empty dictionary to store nicks based on in which "batch" they are received.
+        self.nick_dict = {}
+
+        # Start the count for creating the dictionary keys at 1
+        self.nicklist_count = 1
+
+        # Are we finished? Nevar!
+        self.finished = False
+
+    def run(self, connection, received_message):
+
+        # Check to see if the received message packet has the chan that we are looking for!
+        if received_message.get_chan() != self.chan:
+            return
+        else:
+            pass
+
+        if received_message.name == "Code353":
+            self.code353(connection, received_message)
+        elif received_message.name == "Code366":
+            self.code366(connection)
+        else:
+            print("Unable to execute command. Horrible errors are afoot.")
+
+    def code353(self, connection, received_message):
+        nicks = received_message.get_nicks()
+        debug.echo(connection.debugmode, nicks, "nicks inside elif code353")
+        self.nick_dict[self.nicklist_count] = nicks
+        debug.echo(connection.debugmode, self.nick_dict, "nick_dict")
+        # Increment counter by 1.
+        self.nicklist_count += 1
+
+    def code366(self, connection):
+        debug.echo(connection.debugmode, list(self.nick_dict.values()), "list(nick_dict.values())")
+        for x in list(self.nick_dict.values()):
+            try:
+                connection.send_msg(self.chan, x)
+            except OSError:
+                raise
         try:
-            ircmsg = bytes.decode(connection.ircsock.recv(1024))
+            connection.send_msg(self.chan, self.calltext)
         except OSError:
-            print("Unable to receive message on socket. Exiting.")
             raise
 
-        # # No matter what, print what we received!
-        # print(ircmsg)
-        debug.echo(connection.debugmode, ircmsg, "ircmsg")
+        self.finished = True
 
-        while True:
-            ircmsg = partialmessage + ircmsg
-            partition = ircmsg.partition("\r\n")
-            debug.echo(connection.debugmode, str(partition), "partition")
-            if partition[1] == "":
-                partialmessage = partition[0]
-                break
-            else:
-                # Then we get and assign a message class to the message! Wee.
-                msg = utils.getMsgClass(partition[0])
-                debug.echo(connection.debugmode, msg, "msg object after coming back from utils.getMsgClass")
 
-                # If utils.getMsgClass() returns None, it means it's an unsupported/unparsed message type, so we
-                #     should loop back to the start.
-                if msg is None:
-                    pass
-                elif msg.name == "Code353":
-                    nicks = msg.get_nicks()
-                    debug.echo(connection.debugmode, nicks, "nicks inside elif code353")
-                    nick_dict[nicklist_count] = nicks
-                    debug.echo(connection.debugmode, nick_dict, "nick_dict")
-                    # Increment counter by 1.
-                    nicklist_count += 1
-                elif msg.name == "PRIVMSG":
-                    connection.send_msg(privmsg.get_chan(), "I'm busy at the moment with another command! Try again in a jiffy!")
-                    break
-                elif msg.name == "Code366":
-                    debug.echo(connection.debugmode, list(nick_dict.values()), "list(nick_dict.values())")
-                    for x in list(nick_dict.values()):
-                        try:
-                            connection.send_msg(privmsg.chan, x)
-                        except OSError:
-                            raise
-                    try:
-                        connection.send_msg(privmsg.chan, calltext)
-                    except OSError:
-                        raise
-                    break
-                else:
-                    pass
-            ircmsg = partition[2]
-        break
+
+
+def run(connection, privmsg):
+
+    # Instantiate the Call class and feed it the post_command_text
+    call = Call(privmsg.post_command_text, privmsg.chan)
+
+    # Now we add add the Call class to the connection.processQ list.
+    connection.processQ.append(call)
+
+    # Send the actual NAMES request to the IRC server.
+    connection.names_request(privmsg.chan)
 
     return

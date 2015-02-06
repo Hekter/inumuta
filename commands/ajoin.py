@@ -15,7 +15,7 @@ def run(connection, privmsg):
     except IndexError:
         raise ValueError
 
-    if utils.valid_chan(connection, privmsg, input_chan) == True:
+    if utils.valid_chan(connection, privmsg, input_chan):
         pass
     else:
         return
@@ -32,7 +32,7 @@ def run(connection, privmsg):
 
     # Parse for invalid chars. If False is returned (invalid)
     else:
-        if utils.valid_pw(connection, privmsg, pw) == True:
+        if utils.valid_pw(connection, privmsg, pw):
             pass
         else:
             return

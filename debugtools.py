@@ -2,14 +2,14 @@
 import datetime as time
 
 def echo(debugmode, toprint, debugloc):
-    if debugmode == True:
+    if debugmode:
         print((str(toprint) + ' Debug Location: ' + debugloc), end=' ')
         print(time.datetime.utcnow())
     else:
         return
 
 def echoToIRC(debugmode, toprint, debugloc, ircsock):
-    if debugmode == True:
+    if debugmode:
         ircsock.send(str.encode(str(toprint) + " Debug Location: " + debugloc + " " + str(time.datetime.utcnow())))
     else:
         return

@@ -10,9 +10,7 @@ def run(connection, privmsg):
         raise ValueError
 
     # Now we make sure there aren't any invalid characters in our chan var :3
-    if utils.valid_chan(connection, privmsg, input_chan) == True:
-        pass
-    else:
+    if not utils.valid_chan(connection, privmsg, input_chan):
         return
 
     # Now to grab the password! It'll be in position 1 if there is one.
@@ -21,9 +19,7 @@ def run(connection, privmsg):
     except IndexError:
         pw = ""
 
-    if utils.valid_pw(connection, privmsg, pw) == True:
-        pass
-    else:
+    if not utils.valid_pw(connection, privmsg, pw):
         return
 
     # Call joinChan() function to actually send the join command to the channel.

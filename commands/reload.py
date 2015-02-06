@@ -1,5 +1,5 @@
-import msg_receive
+import utils
 
 def run(connection, privmsg):
-    connection.valid_commands = msg_receive.loadCommands(connection.commandpath)
+    connection.valid_commands = utils.loadCommands(connection.commandpath)
     return
