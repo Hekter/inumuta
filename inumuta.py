@@ -104,8 +104,8 @@ time.sleep(1)
 
 # IRC protocol dicatates we have to identify ourselves with username nonsense.
 # We sleep for two seconds to let the IRC server catch up to us, otherwise we move too fast and stuff gets lost.
-debug.echo(debugmode, "USER " + str(ircsock.socket.gethostname()) + " 0 * :" + BOTNICK + "Bot\r\n", "USER string send.")
-ircsock.send(str.encode("USER " + str(socket.gethostname()) + " 0 * :" + BOTNICK + "Bot\r\n"))
+# debug.echo(debugmode, "USER " + str(ircsock.socket.gethostname()) + " 0 * :" + BOTNICK + "Bot\r\n", "USER string send.")
+ircsock.send(str.encode("USER " + BOTNICK + " 0 * :" + BOTNICK + "Bot\r\n"))
 time.sleep(2)
 
 # Next IRC protocol says we need to establish a nickname.

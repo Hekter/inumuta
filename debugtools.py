@@ -1,12 +1,10 @@
 # So that we know the exact microsecond when shit gets whacky.
 import datetime
-import time
 
 def echo(debugmode, toprint, debugloc):
     if debugmode:
         debugmsg = (str(toprint) + ' Debug Location: ' + debugloc + " " + str(datetime.datetime.utcnow()))
         print(debugmsg)
-        time.sleep(0.5)
     else:
         return
 
