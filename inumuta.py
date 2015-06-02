@@ -113,7 +113,7 @@ time.sleep(2)
 # Skip this step if there is no password
 if NSPASSWORD != '':
     # Then we send along the nickserv password to get our permissions and to be identified.
-    ircsock.send(str.encode("NickServ IDENTIFY " + PASSWORD + "\r\n"))
+    ircsock.send(str.encode("NickServ IDENTIFY " + NSPASSWORD + "\r\n"))
     time.sleep(2)
 
 # Now we establish a connection to the database.
