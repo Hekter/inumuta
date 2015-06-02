@@ -99,7 +99,7 @@ t.start()
 # We must start with a password! If there is one.
 debug.echo(debugmode, "PASS " + IRCPASSWORD, "IRC Password sending.")
 if IRCPASSWORD != "":
-    ircsock.send(str.encode("PASS " + IRCPASSWORD))
+    ircsock.send(str.encode("PASS " + IRCPASSWORD + "\r\n"))
 time.sleep(1)
 
 # IRC protocol dicatates we have to identify ourselves with username nonsense.
