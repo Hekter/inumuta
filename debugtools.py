@@ -1,16 +1,18 @@
 # So that we know the exact microsecond when shit gets whacky.
-import datetime as time
+import datetime
+import time
 
 def echo(debugmode, toprint, debugloc):
     if debugmode:
-        print((str(toprint) + ' Debug Location: ' + debugloc), end=' ')
-        print(time.datetime.utcnow())
+        debugmsg = (str(toprint) + ' Debug Location: ' + debugloc + " " + str(datetime.datetime.utcnow()))
+        print(debugmsg)
+        time.sleep(0.5)
     else:
         return
 
 def echoToIRC(debugmode, toprint, debugloc, ircsock):
     if debugmode:
-        ircsock.send(str.encode(str(toprint) + " Debug Location: " + debugloc + " " + str(time.datetime.utcnow())))
+        ircsock.send(str.encode(str(toprint) + " Debug Location: " + debugloc + " " + str(datetime.datetime.utcnow())))
     else:
         return
 

@@ -97,16 +97,19 @@ threads.append(t)
 t.start()
 
 # We must start with a password! If there is one.
+debug.echo(debugmode, "PASS " + IRCPASSWORD, "IRC Password sending.")
 if IRCPASSWORD != "":
     ircsock.send(str.encode("PASS " + IRCPASSWORD))
 time.sleep(1)
 
 # IRC protocol dicatates we have to identify ourselves with username nonsense.
 # We sleep for two seconds to let the IRC server catch up to us, otherwise we move too fast and stuff gets lost.
+debug.echo(debugmode, "USER " + str(ircsock.socket.gethostname()) + " 0 * :" + BOTNICK + "Bot\r\n", "USER string send.")
 ircsock.send(str.encode("USER " + str(socket.gethostname()) + " 0 * :" + BOTNICK + "Bot\r\n"))
 time.sleep(2)
 
 # Next IRC protocol says we need to establish a nickname.
+debug.echo(debugmode, "NICK " + BOTNICK + "\r\n", "Nick send.")
 ircsock.send(str.encode("NICK " + BOTNICK + "\r\n"))
 time.sleep(2)
 
