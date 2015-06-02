@@ -48,7 +48,8 @@ SERVER = settings[settingsProfile]["SERVER"]
 DEFAULTCHANNEL = settings[settingsProfile]["DEFAULTCHANNEL"]
 DEFAULTCHANNELPW = settings[settingsProfile]["DEFAULTCHANNELPW"]
 BOTNICK = settings[settingsProfile]["NICK"]
-PASSWORD = settings[settingsProfile]["PASSWORD"]
+IRCPASSWORD = settings[settingsProfile]["IRCPASSWORD"]
+NSPASSWORD = settings[settingsProfile]["NSPASSWORD"]
 COMMANDCHAR  = ":" + str(settings[settingsProfile]["COMMANDCHAR"])
 QUIET_MODE = settings[settingsProfile]["QUIET_MODE"]
 
@@ -95,6 +96,11 @@ t = threading.Thread(target=msg_receive.receiver, args=(ConnectionContext,))
 threads.append(t)
 t.start()
 
+# We must start with a password! If there is one.
+if IRCPASSWORD != "":
+    ircsock.send(str.encode("PASS " + IRCPASSWORD))
+time.sleep(1)
+
 # IRC protocol dicatates we have to identify ourselves with username nonsense.
 # We sleep for two seconds to let the IRC server catch up to us, otherwise we move too fast and stuff gets lost.
 ircsock.send(str.encode("USER " + str(socket.gethostname()) + " 0 * :" + BOTNICK + "Bot\r\n"))
@@ -105,7 +111,7 @@ ircsock.send(str.encode("NICK " + BOTNICK + "\r\n"))
 time.sleep(2)
 
 # Skip this step if there is no password
-if PASSWORD != '':
+if NSPASSWORD != '':
     # Then we send along the nickserv password to get our permissions and to be identified.
     ircsock.send(str.encode("NickServ IDENTIFY " + PASSWORD + "\r\n"))
     time.sleep(2)
